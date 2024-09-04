@@ -164,8 +164,8 @@ app.get('/oauth2callback', (req, res) => {
         timeZone: 'Asia/Karachi',
       },
       attendees: [
-        { email: 'wasiquehaider02@gmail.com' },
-        { email: 'wasiquedd@gmail.com' },
+        // { email: 'wasiquehaider02@gmail.com' },
+        // { email: 'wasiquedd@gmail.com' },
       ],
       reminders: {
         useDefault: false,
@@ -180,7 +180,7 @@ app.get('/oauth2callback', (req, res) => {
       {
         calendarId: 'primary',
         resource: event,
-        sendUpdates: 'all',
+        // sendUpdates: 'all',
       },
       (err, event) => {
         if (err) {
