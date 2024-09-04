@@ -137,8 +137,8 @@ app.get('/auth', (req, res) => {
 
 // Handle the callback and exchange code for tokens
 app.get('/oauth2callback', (req, res) => {
-  console.log('request======', req);
   const code = req.query.code;
+  console.log({ code });
 
   // oAuth2Client.getToken(code, (err, tokens) => {
   //   if (err) {
