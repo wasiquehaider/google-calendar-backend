@@ -112,6 +112,8 @@ mongoose
   .connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    connectTimeoutMS: 30000, // 30 seconds
+    socketTimeoutMS: 45000, // 45 seconds
   })
   .then(() => console.log('Connected to MongoDB Atlas'))
   .catch((error) => console.error('Error connecting to MongoDB:', error));
