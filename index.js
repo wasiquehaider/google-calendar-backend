@@ -97,6 +97,7 @@ const mongoose = require('mongoose');
 require('dotenv').config(); // Load environment variables
 
 const app = express();
+app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
 // Initialize OAuth2 client
@@ -251,22 +252,10 @@ app.post('/createEvent', async (req, res) => {
       summary: req.body.summary,
       location: req.body.location,
       description: req.body.description,
-      start: {
-        dateTime: req.body.startDateTime,
-        timeZone: req.body.timeZone,
-      },
-      end: {
-        dateTime: req.body.endDateTime,
-        timeZone: req.body.timeZone,
-      },
+      start: req.body.start,
+      end: req.body.end,
       attendees: req.body.attendees,
-      reminders: {
-        useDefault: false,
-        overrides: [
-          { method: 'email', minutes: 24 * 60 },
-          { method: 'popup', minutes: 10 },
-        ],
-      },
+      reminders: req.body.reminders,
     };
 
     const response = await calendar.events.insert({
