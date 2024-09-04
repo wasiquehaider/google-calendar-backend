@@ -209,20 +209,20 @@ app.get('/oauth2callback', async (req, res) => {
       const calendar = google.calendar({ version: 'v3', auth: oAuth2Client });
 
       const event = {
-        summary: 'My Event',
+        summary: 'Defence Day Celebration',
         location: 'Karachi, Pakistan',
         description: 'Creating an event using OAuth 2.0',
         start: {
-          dateTime: '2024-10-10T09:00:00+05:00',
+          dateTime: '2024-09-06T09:00:00+05:00',
           timeZone: 'Asia/Karachi',
         },
         end: {
-          dateTime: '2024-10-10T10:00:00+05:00',
+          dateTime: '2024-09-06T10:00:00+05:00',
           timeZone: 'Asia/Karachi',
         },
         attendees: [
-          { email: 'attendee1@example.com' },
-          { email: 'attendee2@example.com' },
+          { email: 'wasiquehaider02@gmail.com' },
+          { email: 'wasiquedd@gmail.com' },
         ],
         reminders: {
           useDefault: false,
