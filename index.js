@@ -117,6 +117,14 @@ dotenv.config();
 
 const app = express();
 
+app.get('/', (req, res) => {
+  res.send('Home route');
+});
+
+app.get('/test', (req, res) => {
+  res.send('Testing route');
+});
+
 // Redirect to Google's OAuth 2.0 server for consent
 app.get('/auth', (req, res) => {
   const authUrl = oAuth2Client.generateAuthUrl({
