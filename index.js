@@ -140,58 +140,58 @@ app.get('/oauth2callback', (req, res) => {
   console.log('request======', req);
   const code = req.query.code;
 
-  oAuth2Client.getToken(code, (err, tokens) => {
-    if (err) {
-      console.error('Error retrieving access token', err);
-      return;
-    }
-    oAuth2Client.setCredentials(tokens);
+  // oAuth2Client.getToken(code, (err, tokens) => {
+  //   if (err) {
+  //     console.error('Error retrieving access token', err);
+  //     return;
+  //   }
+  //   oAuth2Client.setCredentials(tokens);
 
-    // Store the tokens for later use (e.g., in a database)
-    // Create an event using the tokens
-    const calendar = google.calendar({ version: 'v3', auth: oAuth2Client });
+  //   // Store the tokens for later use (e.g., in a database)
+  //   // Create an event using the tokens
+  //   const calendar = google.calendar({ version: 'v3', auth: oAuth2Client });
 
-    const event = {
-      summary: 'My Event',
-      location: 'Karachi, Pakistan',
-      description: 'Creating an event using OAuth 2.0',
-      start: {
-        dateTime: '2024-09-06T12:00:00+05:00',
-        timeZone: 'Asia/Karachi',
-      },
-      end: {
-        dateTime: '2024-09-06T5:00:00+05:00',
-        timeZone: 'Asia/Karachi',
-      },
-      attendees: [
-        // { email: 'wasiquehaider02@gmail.com' },
-        // { email: 'wasiquedd@gmail.com' },
-      ],
-      reminders: {
-        useDefault: false,
-        overrides: [
-          { method: 'email', minutes: 24 * 60 },
-          { method: 'popup', minutes: 10 },
-        ],
-      },
-    };
+  //   const event = {
+  //     summary: 'My Event',
+  //     location: 'Karachi, Pakistan',
+  //     description: 'Creating an event using OAuth 2.0',
+  //     start: {
+  //       dateTime: '2024-09-06T12:00:00+05:00',
+  //       timeZone: 'Asia/Karachi',
+  //     },
+  //     end: {
+  //       dateTime: '2024-09-06T5:00:00+05:00',
+  //       timeZone: 'Asia/Karachi',
+  //     },
+  //     attendees: [
+  //       // { email: 'wasiquehaider02@gmail.com' },
+  //       // { email: 'wasiquedd@gmail.com' },
+  //     ],
+  //     reminders: {
+  //       useDefault: false,
+  //       overrides: [
+  //         { method: 'email', minutes: 24 * 60 },
+  //         { method: 'popup', minutes: 10 },
+  //       ],
+  //     },
+  //   };
 
-    calendar.events.insert(
-      {
-        calendarId: 'primary',
-        resource: event,
-        // sendUpdates: 'all',
-      },
-      (err, event) => {
-        if (err) {
-          console.error('Error creating event', err);
-          return;
-        }
-        console.log('Event created: %s', event.htmlLink);
-        res.send('Event created');
-      }
-    );
-  });
+  //   calendar.events.insert(
+  //     {
+  //       calendarId: 'primary',
+  //       resource: event,
+  //       // sendUpdates: 'all',
+  //     },
+  //     (err, event) => {
+  //       if (err) {
+  //         console.error('Error creating event', err);
+  //         return;
+  //       }
+  //       console.log('Event created: %s', event.htmlLink);
+  //       res.send('Event created');
+  //     }
+  //   );
+  // });
 });
 
 app.listen(3000, () => {
