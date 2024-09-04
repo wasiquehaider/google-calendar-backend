@@ -132,7 +132,7 @@ app.get('/oauth2callback', async (req, res) => {
     // Save tokens to file
     fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens));
 
-    res.redirect('/eventList'); // Redirect to /eventList to show events or another page
+    // res.redirect('/eventList'); // Redirect to /eventList to show events or another page
   } catch (error) {
     console.error('Error in /oauth2callback', error);
     res.status(500).send('Internal Server Error');
