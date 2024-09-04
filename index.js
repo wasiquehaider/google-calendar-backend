@@ -128,7 +128,7 @@ const tokenSchema = new mongoose.Schema({
   expiry_date: Number,
 });
 
-const Token = mongoose.model('Token', tokenSchema);
+const Token = mongoose.model('Token', tokenSchema, 'tokens');
 
 // Google OAuth2 Authorization Route
 app.get('/auth', (req, res) => {
