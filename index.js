@@ -221,6 +221,67 @@ app.get('/eventList', async (req, res) => {
   }
 });
 
+app.post('/createEvent', async (req, res) => {
+  try {
+    let tokens = await loadTokens();
+    if (!tokens) {
+      return res.status(401).send('Not authenticated');
+    }
+
+    oAuth2Client.setCredentials(tokens);
+
+    if (isTokenExpired(tokens)) {
+      const { credentials } = await oAuth2Client.refreshToken(
+        tokens.refresh_token
+      );
+      oAuth2Client.setCredentials(credentials);
+
+      // Update tokens in MongoDB
+      await Token.findOneAndUpdate({ user: 'default' }, credentials, {
+        upsert: true,
+        new: true,
+      });
+
+      tokens = credentials;
+    }
+
+    const calendar = google.calendar({ version: 'v3', auth: oAuth2Client });
+
+    const event = {
+      summary: req.body.summary,
+      location: req.body.location,
+      description: req.body.description,
+      start: {
+        dateTime: req.body.startDateTime,
+        timeZone: req.body.timeZone,
+      },
+      end: {
+        dateTime: req.body.endDateTime,
+        timeZone: req.body.timeZone,
+      },
+      attendees: req.body.attendees,
+      reminders: {
+        useDefault: false,
+        overrides: [
+          { method: 'email', minutes: 24 * 60 },
+          { method: 'popup', minutes: 10 },
+        ],
+      },
+    };
+
+    const response = await calendar.events.insert({
+      calendarId: 'primary',
+      resource: event,
+      sendUpdates: 'all',
+    });
+
+    res.status(200).send(`Event created: ${response.data.htmlLink}`);
+  } catch (error) {
+    console.error('Error in /oauth2callback', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
