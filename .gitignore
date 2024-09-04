@@ -3,3 +3,5 @@
 
 # Ignore service account JSON file
 service_account.json
+
+node_modules/*
