@@ -93,32 +93,51 @@
 
 const express = require('express');
 const { google } = require('googleapis');
-const { OAuth2 } = google.auth;
-const fs = require('fs');
-const path = require('path');
-require('dotenv').config(); // To load environment variables from .env file
+const mongoose = require('mongoose');
+require('dotenv').config(); // Load environment variables
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const TOKEN_PATH = path.join(__dirname, 'tokens.json');
 
 // Initialize OAuth2 client
+const { OAuth2 } = google.auth;
 const oAuth2Client = new OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
   process.env.GOOGLE_REDIRECT_URI
 );
 
-// Route to authenticate and redirect to Google's OAuth 2.0 server
+// MongoDB connection using Mongoose
+mongoose
+  .connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log('Connected to MongoDB Atlas'))
+  .catch((error) => console.error('Error connecting to MongoDB:', error));
+
+// Define the token schema and model
+const tokenSchema = new mongoose.Schema({
+  user: { type: String, required: true, unique: true },
+  access_token: String,
+  refresh_token: String,
+  scope: String,
+  token_type: String,
+  expiry_date: Number,
+});
+
+const Token = mongoose.model('Token', tokenSchema);
+
+// Google OAuth2 Authorization Route
 app.get('/auth', (req, res) => {
   const authUrl = oAuth2Client.generateAuthUrl({
     access_type: 'offline',
-    scope: 'https://www.googleapis.com/auth/calendar.readonly', // Scopes for read-only access
+    scope: 'https://www.googleapis.com/auth/calendar.readonly',
   });
   res.redirect(authUrl);
 });
 
-// OAuth2 callback to handle token exchange
+// Google OAuth2 Callback Route
 app.get('/oauth2callback', async (req, res) => {
   try {
     const code = req.query.code;
@@ -129,61 +148,58 @@ app.get('/oauth2callback', async (req, res) => {
     const { tokens } = await oAuth2Client.getToken(code);
     oAuth2Client.setCredentials(tokens);
 
-    // Save tokens to file
-    fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens));
+    // Save tokens to MongoDB
+    await Token.findOneAndUpdate(
+      { user: 'default' }, // Replace with a user identifier if needed
+      tokens,
+      { upsert: true, new: true }
+    );
 
-    // res.redirect('/eventList'); // Redirect to /eventList to show events or another page
+    res.redirect('/eventList');
   } catch (error) {
     console.error('Error in /oauth2callback', error);
     res.status(500).send('Internal Server Error');
   }
 });
 
-// Function to load tokens from file
-function loadTokens() {
-  try {
-    const data = fs.readFileSync(TOKEN_PATH, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    return null;
-  }
+// Load tokens from MongoDB
+async function loadTokens() {
+  return await Token.findOne({ user: 'default' });
 }
 
-// Function to check if token is expired
+// Check token expiration
 function isTokenExpired(token) {
   const now = Date.now();
   return token.expiry_date < now;
 }
 
-// Endpoint to list events
+// Event List Endpoint
 app.get('/eventList', async (req, res) => {
   try {
-    let tokens = loadTokens();
+    let tokens = await loadTokens();
     if (!tokens) {
       return res.status(401).send('Not authenticated');
     }
 
-    const oAuth2Client = new OAuth2(
-      process.env.GOOGLE_CLIENT_ID,
-      process.env.GOOGLE_CLIENT_SECRET,
-      process.env.GOOGLE_REDIRECT_URI
-    );
-
     oAuth2Client.setCredentials(tokens);
 
-    // Check if token is expired and refresh if needed
     if (isTokenExpired(tokens)) {
       const { credentials } = await oAuth2Client.refreshToken(
         tokens.refresh_token
       );
       oAuth2Client.setCredentials(credentials);
-      fs.writeFileSync(TOKEN_PATH, JSON.stringify(credentials));
-      tokens = credentials; // Update tokens with refreshed credentials
+
+      // Update tokens in MongoDB
+      await Token.findOneAndUpdate({ user: 'default' }, credentials, {
+        upsert: true,
+        new: true,
+      });
+
+      tokens = credentials;
     }
 
     const calendar = google.calendar({ version: 'v3', auth: oAuth2Client });
 
-    // Fetch events from the primary calendar
     const response = await calendar.events.list({
       calendarId: 'primary',
       timeMin: new Date().toISOString(),
