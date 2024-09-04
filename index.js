@@ -137,8 +137,12 @@ app.get('/auth', (req, res) => {
 
 // Handle the callback and exchange code for tokens
 app.get('/oauth2callback', (req, res) => {
-  const code = req.query.code;
-  console.log({ code });
+  try {
+    const code = req.query.code;
+    console.log({ code });
+  } catch (error) {
+    console.log('error aya', error);
+  }
 
   // oAuth2Client.getToken(code, (err, tokens) => {
   //   if (err) {
