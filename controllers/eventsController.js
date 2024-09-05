@@ -1,6 +1,7 @@
 const oAuth2Client = require('../config/google');
 const Token = require('../models/token');
 const calendarService = require('../services/calendarService');
+const { isTokenExpired } = require('../utils/googleAuth');
 
 exports.listEvents = async (req, res) => {
   try {
@@ -11,7 +12,7 @@ exports.listEvents = async (req, res) => {
 
     oAuth2Client.setCredentials(tokens);
 
-    if (calendarService.isTokenExpired(tokens)) {
+    if (isTokenExpired(tokens)) {
       const { credentials } = await oAuth2Client.refreshToken(
         tokens.refresh_token
       );
@@ -41,7 +42,7 @@ exports.currentDayEvents = async (req, res) => {
 
     oAuth2Client.setCredentials(tokens);
 
-    if (calendarService.isTokenExpired(tokens)) {
+    if (isTokenExpired(tokens)) {
       const { credentials } = await oAuth2Client.refreshToken(
         tokens.refresh_token
       );
@@ -72,7 +73,7 @@ exports.createEvent = async (req, res) => {
 
     oAuth2Client.setCredentials(tokens);
 
-    if (calendarService.isTokenExpired(tokens)) {
+    if (isTokenExpired(tokens)) {
       const { credentials } = await oAuth2Client.refreshToken(
         tokens.refresh_token
       );
