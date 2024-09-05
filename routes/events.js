@@ -7,7 +7,7 @@ const {
 } = require('../controllers/eventsController');
 const { verifyToken } = require('../middlewares/tokenMiddleware');
 
-router.get('/eventList', verifyToken, listEvents);
+// router.get('/eventList', verifyToken, listEvents);
 router.get('/currentDayEvents', verifyToken, currentDayEvents);
 router.post('/createEvent', verifyToken, createEvent);
 
