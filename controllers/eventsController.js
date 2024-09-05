@@ -32,6 +32,36 @@ exports.listEvents = async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 };
+exports.currentDayEvents = async (req, res) => {
+  try {
+    let tokens = await Token.findOne({ user: 'default' });
+    if (!tokens) {
+      return res.status(401).send('Not authenticated');
+    }
+
+    oAuth2Client.setCredentials(tokens);
+
+    if (calendarService.isTokenExpired(tokens)) {
+      const { credentials } = await oAuth2Client.refreshToken(
+        tokens.refresh_token
+      );
+      oAuth2Client.setCredentials(credentials);
+
+      await Token.findOneAndUpdate({ user: 'default' }, credentials, {
+        upsert: true,
+        new: true,
+      });
+
+      tokens = credentials;
+    }
+
+    const events = await calendarService.currentDayEvents(oAuth2Client);
+    res.json({ events });
+  } catch (error) {
+    console.error('Error in /currentDayEvents', error);
+    res.status(500).send('Internal Server Error');
+  }
+};
 
 exports.createEvent = async (req, res) => {
   try {
