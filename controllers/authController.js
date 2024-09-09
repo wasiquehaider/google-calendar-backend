@@ -12,6 +12,7 @@ exports.getAuthUrl = (req, res) => {
 exports.oauth2callback = async (req, res) => {
   try {
     const code = req.query.code || req.query.access_token;
+    console.log('code is ', code);
     if (!code) {
       return res.status(400).send('No code provided');
     }
