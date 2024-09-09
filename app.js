@@ -10,6 +10,12 @@ connectDB();
 const app = express();
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  res.send('Home Route');
+});
+app.get('/test', (req, res) => {
+  res.send('Test Route');
+});
 app.use('/auth', authRoutes);
 app.use('/', eventRoutes);
 
