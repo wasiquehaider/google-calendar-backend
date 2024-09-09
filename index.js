@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
 app.get('/test', (req, res) => {
   res.send('Test Route');
 });
-app.use('/auth', authRoutes);
+app.use('/', authRoutes);
 app.use('/', eventRoutes);
 
 const PORT = process.env.PORT || 3000;
