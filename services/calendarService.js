@@ -29,6 +29,22 @@ exports.currentDayEvents = async (auth) => {
   });
 };
 
+exports.eventsForDate = async (auth, date) => {
+  const startOfDay = new Date(date);
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(date);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  return await calendar.events.list({
+    calendarId: 'primary',
+    timeMin: startOfDay.toISOString(),
+    timeMax: endOfDay.toISOString(),
+    singleEvents: true,
+    orderBy: 'startTime',
+    auth,
+  });
+};
+
 exports.createEvent = async (auth, event) => {
   return await calendar.events.insert({
     calendarId: 'primary',
