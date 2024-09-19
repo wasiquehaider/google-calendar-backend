@@ -98,18 +98,29 @@ exports.eventsForDate = async (req, res) => {
     );
     const events = eventsResponse.data.items;
 
+    // Get user's email from tokens or fetch from People API
+    const userEmail = tokens.email; // Ensure you have user's email or fetch it if needed
+
+    // Filter events to include only those where the user is an attendee
+    const userEvents = events.filter((event) => {
+      return (
+        event.attendees &&
+        event.attendees.some((attendee) => attendee.email === userEmail)
+      );
+    });
+
     // Current time for comparison
     const currentTime = new Date();
 
     // Filter for ongoing meetings (meetings that have started but not yet ended)
-    const ongoingMeetings = events.filter((event) => {
+    const ongoingMeetings = userEvents.filter((event) => {
       const startTime = new Date(event.start.dateTime || event.start.date);
       const endTime = new Date(event.end.dateTime || event.end.date);
       return currentTime >= startTime && currentTime <= endTime;
     });
 
     // Find the next meeting (meeting that starts after the current time)
-    const nextMeeting = events
+    const nextMeeting = userEvents
       .filter((event) => {
         const startTime = new Date(event.start.dateTime || event.start.date);
         return startTime > currentTime;
@@ -123,10 +134,10 @@ exports.eventsForDate = async (req, res) => {
     res.json({
       ongoingMeetings,
       nextMeeting,
-      allEvents: events,
+      allEvents: userEvents,
     });
   } catch (error) {
-    console.error('Error in /eventListForDate', error);
+    console.error('Error in /eventsForDate', error);
     res.status(500).send('Internal Server Error');
   }
 };
