@@ -9,7 +9,7 @@ exports.isTokenExpired = (token) => {
 exports.getUserEmail = async (auth) => {
   const peopleService = google.people({ version: 'v1', auth });
   const me = await peopleService.people.get({
-    resourceName: 'profile',
+    resourceName: 'people/me',
     personFields: 'emailAddresses',
   });
   const emails = me.data.emailAddresses;
