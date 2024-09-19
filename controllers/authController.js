@@ -25,7 +25,8 @@ exports.oauth2callback = async (req, res) => {
       new: true,
     });
 
-    res.redirect('/currentDayEvents');
+    // res.redirect('/currentDayEvents');
+    res.send('Logged in successfully');
   } catch (error) {
     console.error('Error in /oauth2callback', error);
     res.status(500).send('Internal Server Error');
