@@ -1,7 +1,7 @@
 const oAuth2Client = require('../config/google');
 const Token = require('../models/token');
 const calendarService = require('../services/calendarService');
-const { isTokenExpired } = require('../utils/googleAuth');
+const { isTokenExpired, getUserEmail } = require('../utils/googleAuth');
 
 exports.listEvents = async (req, res) => {
   try {
@@ -98,9 +98,10 @@ exports.eventsForDate = async (req, res) => {
     );
     const events = eventsResponse.data.items;
 
-    // Get user's email from tokens or fetch from People API
-    const userEmail = tokens.email; // Ensure you have user's email or fetch it if needed
-
+    const userEmail = await getUserEmail(oAuth2Client);
+    if (!userEmail) {
+      return res.status(500).send('Unable to retrieve user email');
+    }
     // Filter events to include only those where the user is an attendee
     const userEvents = events.filter((event) => {
       return (

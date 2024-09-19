@@ -42,7 +42,10 @@ const Token = mongoose.model('Token', tokenSchema, 'tokens');
 app.get('/auth', (req, res) => {
   const authUrl = oAuth2Client.generateAuthUrl({
     access_type: 'offline',
-    scope: 'https://www.googleapis.com/auth/calendar',
+    scope: [
+      'https://www.googleapis.com/auth/calendar',
+      'https://www.googleapis.com/auth/userinfo.email',
+    ],
   });
   res.redirect(authUrl);
 });
