@@ -30,7 +30,13 @@ exports.oauth2callback = async (req, res) => {
     });
 
     // res.redirect('/currentDayEvents');
-    res.send('Logged in successfully');
+    // res.send('Logged in successfully');
+    res.json({
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token,
+      expires_in: tokens.expiry_date,
+      token_type: tokens.token_type,
+    });
   } catch (error) {
     console.error('Error in /oauth2callback', error);
     res.status(500).send('Internal Server Error');
