@@ -130,7 +130,7 @@ exports.eventsForDate = async (req, res) => {
         (a, b) =>
           new Date(a.start.dateTime || a.start.date) -
           new Date(b.start.dateTime || b.start.date)
-      )[0];
+      );
 
     res.json({
       ongoingMeetings,
